@@ -402,10 +402,8 @@ bool LoRa::LoRa_AT(unsigned char *data_buffer, bool is_query, const char *cmd, c
 	case ERROR: Serial.println("Receipt ERROR...");  Mode(PASS_THROUGH_MODE); return false; break;
 	case Invalid: Serial.println("Involid!"); Mode(PASS_THROUGH_MODE); return false; break;
 
-	case OK: Serial.println("Set para OK"); break;
-		case Bytes
-			:
-				for (unsigned char i = 0; i < ReceiveLength; i++)
+	case OK: Serial.println("Set para OK <LoRa_AT>"); break;
+	case Bytes:for (unsigned char i = 0; i < ReceiveLength; i++)
 				{
 					Serial.print(data_buffer[i], HEX);
 					Serial.print(" ");
@@ -471,8 +469,10 @@ bool LoRa::Rewrite_ID(void)
 			if (!VerifyFlag)
 			{
 				Serial.println("LoRa addr for AT Error!, write EP addr to LoRa! <Rewrite_ID>");
-				if (!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer))
+				if (!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer)){
+					Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer)");
 					return false;
+				}
 			}
 			else
 			{
@@ -484,19 +484,25 @@ bool LoRa::Rewrite_ID(void)
 		else
 		{
 			Serial.println("EP saved err, rewrite! <Rewrite_ID>");
-			if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr))
+			if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)){
+				Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)111");
 				return false;
+			}
 		}
 	}
 	/* 如果是设备是第一次运行 */
 	else
 	{
 		/*写入读出来的地址*/
-		if (!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr))
+		if (!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr)){
+			Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr)");
 			return false;
+		}
 
-		if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr))
+		if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)){
+			Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)222");
 			return false;
+		}
 	}
 
 	return true;
@@ -601,8 +607,8 @@ void LoRa::Parameter_Init(bool only_net)
 		iwdg_feed();
 		if (!only_net)
 		{
-			StatusBuffer[i++] = Rewrite_ID();
-			StatusBuffer[i++] = Param_Check(AT_MADDR_, "71000000", false);
+			StatusBuffer[i++] = Rewrite_ID();Serial.println(String("StatusBuffer[0] = ") + StatusBuffer[0]);
+			StatusBuffer[i++] = Param_Check(AT_MADDR_, "71000000", false);Serial.println(String("StatusBuffer[1] = ") + StatusBuffer[1]);
 			// StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", true);
 			StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", false);
 			StatusBuffer[i++] = Param_Check(AT_TFREQ_, "1C578DE0", false);
@@ -611,9 +617,11 @@ void LoRa::Parameter_Init(bool only_net)
 
 #if USE_LORA_RESET
 			if (LoRa_Para_Config.Read_LoRa_Com_Mode() == 0xF1)
-				StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);    //配置成网关模式
+				// StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);    //配置成网关模式
+				StatusBuffer[i++] = Param_Check(AT_NET_, "01", false);    //配置成网关模式
 			else
-				StatusBuffer[i++] = Param_Check(AT_NET_, "00", true);    //配置成节点模式
+				// StatusBuffer[i++] = Param_Check(AT_NET_, "00", true);    //配置成节点模式
+				StatusBuffer[i++] = Param_Check(AT_NET_, "00", false);    //配置成节点模式
 
 #else
 			StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);
@@ -647,7 +655,8 @@ void LoRa::Parameter_Init(bool only_net)
 
 		for (unsigned char j = 0; j < i; j++)
 		{
-			if (StatusBuffer[j] == 0)
+			Serial.println(String("StatusBuffer[")+ j + "]=" + StatusBuffer[j]);
+			if (StatusBuffer[j] == false)
 			{
 				SetStatusFlag = false;
 				Serial.println("Param init Err, Try again...");

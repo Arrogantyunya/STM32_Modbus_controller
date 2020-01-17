@@ -128,7 +128,7 @@ void Receipt::Request_Set_Group_Number(void)
 
 	unsigned char RequestFrame[20] = { 0 };
 	unsigned char FrameLength = 0;
-	unsigned char RandomSeed;
+	// unsigned char RandomSeed;
 	unsigned long int RandomSendInterval = 0;
 
 	Receipt_Random_Wait_Value(&RandomSendInterval);
@@ -181,7 +181,7 @@ void Receipt::Request_Device_SN_and_Channel(void)
 
 	unsigned char RequestFrame[20] = { 0 };
 	unsigned char FrameLength = 0;
-	unsigned char RandomSeed;
+	// unsigned char RandomSeed;
 	unsigned long int RandomSendInterval = 0;
 
 	Receipt_Random_Wait_Value(&RandomSendInterval);
@@ -234,7 +234,7 @@ void Receipt::Working_Parameter_Receipt(bool use_random_wait, unsigned char time
 
 	unsigned char ReceiptFrame[64] = { 0 };
 	unsigned char ReceiptLength = 0;
-	unsigned char RandomSeed;
+	// unsigned char RandomSeed;
 	unsigned long int RandomSendInterval = 0;
 
 	iwdg_feed();
@@ -329,7 +329,7 @@ void Receipt::General_Receipt(unsigned char status, unsigned char send_times)
 
 	unsigned char ReceiptFrame[25] = { 0 };
 	unsigned char ReceiptLength = 0;
-	unsigned char RandomSeed;
+	// unsigned char RandomSeed;
 	unsigned long int RandomSendInterval = 0;
 
 	Receipt_Random_Wait_Value(&RandomSendInterval);

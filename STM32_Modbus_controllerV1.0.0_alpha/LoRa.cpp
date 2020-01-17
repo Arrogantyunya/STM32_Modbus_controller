@@ -436,7 +436,6 @@ bool LoRa::Rewrite_ID(void)
 	if (!LoRa_AT(RcvBuffer, true, AT_ADDR_, 0))
 	{
 		Serial.println("Read LoRa ADDR Err <Rewrite_ID>");
-		Serial.println("读取LORA地址出错<Rewrite_ID>");
 		return false;
 	}
 
@@ -604,7 +603,8 @@ void LoRa::Parameter_Init(bool only_net)
 		{
 			StatusBuffer[i++] = Rewrite_ID();
 			StatusBuffer[i++] = Param_Check(AT_MADDR_, "71000000", false);
-			StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", true);
+			// StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", true);
+			StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", false);
 			StatusBuffer[i++] = Param_Check(AT_TFREQ_, "1C578DE0", false);
 			StatusBuffer[i++] = Param_Check(AT_RFREQ_, "1C03AE80", false);
 			StatusBuffer[i++] = Param_Check(AT_SYNC_, "34", false);
@@ -621,21 +621,27 @@ void LoRa::Parameter_Init(bool only_net)
 
 			StatusBuffer[i++] = Param_Check(AT_TSF_, "09", false);
 			StatusBuffer[i++] = Param_Check(AT_RSF_, "09", false);
-			StatusBuffer[i++] = Param_Check(AT_SIP_, "01", true);
+			// StatusBuffer[i++] = Param_Check(AT_SIP_, "01", true);
+			StatusBuffer[i++] = Param_Check(AT_SIP_, "01", false);
 			StatusBuffer[i++] = Param_Check(AT_BW_, "07", false);
 			StatusBuffer[i++] = Param_Check(AT_POW_, "14", false);
-			StatusBuffer[i++] = Param_Check(AT_TIQ_, "00", true);
+			// StatusBuffer[i++] = Param_Check(AT_TIQ_, "00", true);
+			StatusBuffer[i++] = Param_Check(AT_TIQ_, "00", false);
 		}
 		else
 		{
 #if USE_LORA_RESET
 			if (LoRa_Para_Config.Read_LoRa_Com_Mode() == 0xF1)
-				StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);    //配置成网关模式
+				// StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);    //配置成网关模式
+				StatusBuffer[i++] = Param_Check(AT_NET_, "01", false);    //配置成网关模式
 			else
-				StatusBuffer[i++] = Param_Check(AT_NET_, "00", true);    //配置成节点模式    
+				// StatusBuffer[i++] = Param_Check(AT_NET_, "00", true);    //配置成节点模式    
+				StatusBuffer[i++] = Param_Check(AT_NET_, "00", false);    //配置成节点模式    
+
 
 #else
-			StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);
+			// StatusBuffer[i++] = Param_Check(AT_NET_, "01", true);
+			StatusBuffer[i++] = Param_Check(AT_NET_, "01", false);
 #endif
 		}
 
@@ -645,7 +651,6 @@ void LoRa::Parameter_Init(bool only_net)
 			{
 				SetStatusFlag = false;
 				Serial.println("Param init Err, Try again...");
-				Serial.println("参数初始化错误, Try again...");
 
 #if USE_LORA_RESET
 				AlarmLEDRunNum++;
@@ -675,7 +680,7 @@ void LoRa::Parameter_Init(bool only_net)
 #endif
 
 
-	LED_SET_LORA_PARA_ERROR;
+	// LED_SET_LORA_PARA_ERROR;
 	Serial.println("LoRa parameters set ERROR! <Parameter_Init>");
 	Serial.println("LORA参数配置错误! <Parameter_Init>");
 	delay(3000);

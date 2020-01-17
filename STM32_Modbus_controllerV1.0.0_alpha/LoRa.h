@@ -6,13 +6,13 @@
 #define USE_LORA_RESET  1
 
 //GPIO definition
-#define RESET_PIN       PC12
-#define WAKEUP_PIN      PD2
-#define AT_CMD_PIN      PB3
+#define RESET_PIN       PB12
+#define WAKEUP_PIN      PB1
+#define AT_CMD_PIN      PB0
 
-#define LORA_PWR_PIN    PB4
+#define LORA_PWR_PIN    PB13
 
-#define LoRa_Serial     Serial3  //USART3 --> USART2, when use serial upload
+#define LoRa_Serial     Serial1  //USART3 --> USART2, when use serial upload
 
 #define LORA_PWR_ON     (digitalWrite(LORA_PWR_PIN, HIGH))
 #define LORA_PWR_OFF    (digitalWrite(LORA_PWR_PIN, LOW))

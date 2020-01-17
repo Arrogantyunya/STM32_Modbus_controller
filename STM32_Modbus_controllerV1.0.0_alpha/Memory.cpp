@@ -267,28 +267,60 @@ bool SN_Operations::Set_SN_Access_Network_Flag(void)
  */
 bool SN_Operations::Clear_SN_Access_Network_Flag(void)
 {
-	if (digitalRead(SW_FUN2) == LOW)    //如果功能按键2按下
+	Serial.println("If you need to clear the registration, send \"YES\"	<Clear_SN_Access_Network_Flag>");
+	iwdg_feed();
+	delay(5000);
+	iwdg_feed();
+	while (Serial.available() > 0)
 	{
-		iwdg_feed();
-		delay(5000);    //保持按下5S
-		iwdg_feed();
-		if (digitalRead(SW_FUN2) == LOW)
-		{
-			if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) != 0x00)
-			{
-				EEPROM_Write_Enable();
-				AT24CXX_WriteOneByte(SN_ACCESS_NETWORK_FLAG_ADDR, 0x00);
-				EEPROM_Write_Disable();
-			}
-			/*验证标志位是否清除成功*/
-			if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) == 0x00)
-				return true;
-			else
-				return false;
-		}
-		return false;
+		comdata += char(Serial.read());
+		delay(2);
 	}
-	return false;
+	if (comdata.length() > 0)
+	{
+		comdata.toUpperCase();
+		Serial.println(comdata);
+
+		if (comdata == String("YES"))
+		{
+			Serial.println(String("comdata = ")+comdata);
+		}
+		else
+		{
+			Serial.println("Input error	<Clear_SN_Access_Network_Flag>");
+		}
+		
+		
+	}
+	else
+	{
+		Serial.println("END	<Clear_SN_Access_Network_Flag>");
+	}
+	
+	
+	
+	// if (digitalRead(SW_FUN2) == LOW)    //如果功能按键2按下
+	// {
+	// 	iwdg_feed();
+	// 	delay(5000);    //保持按下5S
+	// 	iwdg_feed();
+	// 	if (digitalRead(SW_FUN2) == LOW)
+	// 	{
+	// 		if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) != 0x00)
+	// 		{
+	// 			EEPROM_Write_Enable();
+	// 			AT24CXX_WriteOneByte(SN_ACCESS_NETWORK_FLAG_ADDR, 0x00);
+	// 			EEPROM_Write_Disable();
+	// 		}
+	// 		/*验证标志位是否清除成功*/
+	// 		if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) == 0x00)
+	// 			return true;
+	// 		else
+	// 			return false;
+	// 	}
+	// 	return false;
+	// }
+	// return false;
 }
 
 /*
@@ -823,26 +855,40 @@ bool LoRa_Config::Verify_LoRa_Addr_Flag(void)
 
 /*
  @brief     : 保存该设备的软件版本号
- @para      : 软件包本号高8位，低8位
- @return    : 无
+			  Save device's software version.
+ @para      : Version number high byte, version number low byte.
+ @return    : None
  */
 void Soft_Hard_Vertion::Save_Software_version(unsigned char number_high, unsigned char number_low)
 {
 	EEPROM_Write_Enable();
-	AT24CXX_WriteOneByte(SOFT_HARD_VERSION_BASE_ADDR, number_high);
-	AT24CXX_WriteOneByte(SOFT_HARD_VERSION_BASE_ADDR + 1, number_low);
+	AT24CXX_WriteOneByte(SOFT_VERSION_BASE_ADDR, number_high);
+	AT24CXX_WriteOneByte(SOFT_VERSION_BASE_ADDR + 1, number_low);
 	EEPROM_Write_Disable();
+}
+
+unsigned char Soft_Hard_Vertion::Read_hardware_version(unsigned char number_addr)
+{
+	unsigned char version = AT24CXX_ReadOneByte(number_addr);
+	return version;
+}
+
+unsigned char Soft_Hard_Vertion::Read_Software_version(unsigned char number_addr)
+{
+	unsigned char version = AT24CXX_ReadOneByte(number_addr);
+	return version;
 }
 
 /*
  @brief     : 保存该设备的硬件版本号
- @para      : 硬件版本号高8位，低8位
- @return    : 无
+			  Save device's hardware version.
+ @para      : Version number high byte, version number low byte.
+ @return    : None
  */
 void Soft_Hard_Vertion::Save_hardware_version(unsigned char number_high, unsigned char number_low)
 {
 	EEPROM_Write_Enable();
-	AT24CXX_WriteOneByte(SOFT_HARD_VERSION_BASE_ADDR + 2, number_high);
-	AT24CXX_WriteOneByte(SOFT_HARD_VERSION_END_ADDR, number_low);
+	AT24CXX_WriteOneByte(HARD_VERSION_BASE_ADDR, number_high);
+	AT24CXX_WriteOneByte(HARD_VERSION_BASE_ADDR + 1, number_low);
 	EEPROM_Write_Disable();
 }

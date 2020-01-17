@@ -15,11 +15,11 @@
 
 Some_Peripherals Some_Peripheral;
 
-LED Which_LED;
-unsigned int LED_Freq = 0;  //LED_Freq * 100ms
+// LED Which_LED;
+// unsigned int LED_Freq = 0;  //LED_Freq * 100ms
 
 /*
- @brief   : 设置蜂鸣器，LED，功能按钮等引脚
+ @brief   : 设置继电器，数字输入，模拟输入等外设引脚
  @param   : 无
  @return  : 无
  */
@@ -27,24 +27,43 @@ void Some_Peripherals::Peripheral_GPIO_Config(void)
 {
 	pinMode(KCZJ1, OUTPUT);
 	pinMode(KCZJ2, OUTPUT);
-	pinMode(DO1, OUTPUT);
-	pinMode(DO2, OUTPUT);
-	pinMode(LED1_PIN, OUTPUT);
-	pinMode(LED2_PIN, OUTPUT);
-	pinMode(LED3_PIN, OUTPUT);
-	pinMode(LED4_PIN, OUTPUT);
-	pinMode(SW_FUN1, INPUT);
-	pinMode(SW_FUN2, INPUT);
-	pinMode(DI1, INPUT);
-	pinMode(DI2, INPUT);
-	GREEN1_OFF;
-	GREEN2_OFF;
-	RED1_OFF;
-	RED2_OFF;
-	KCZJ1_OFF;
-	KCZJ2_OFF;
-	DO1_OFF;
-	DO2_OFF;
+	pinMode(KCZJ3, OUTPUT);
+	pinMode(KCZJ4, OUTPUT);
+	pinMode(KCZJ5, OUTPUT);
+	pinMode(KCZJ6, OUTPUT);
+	pinMode(KCZJ7, OUTPUT);
+	pinMode(KCZJ8, OUTPUT);
+	pinMode(KCZJ9, OUTPUT);
+	pinMode(KCZJ10, OUTPUT);
+	pinMode(KCZJ11, OUTPUT);
+	pinMode(KCZJ12, OUTPUT);
+
+	pinMode(DI1,INPUT);
+	pinMode(DI2,INPUT);
+	pinMode(DI2,INPUT);
+	pinMode(DI3,INPUT);
+	pinMode(DI4,INPUT);
+	pinMode(DI5,INPUT);
+	pinMode(DI5,INPUT);
+	pinMode(DI6,INPUT);
+
+	pinMode(AI1,INPUT);
+	pinMode(AI2,INPUT);
+	pinMode(AI3,INPUT);
+	pinMode(AI4,INPUT);
+	pinMode(AI5,INPUT);
+	pinMode(AI6,INPUT);
+	pinMode(AI7,INPUT);
+	pinMode(AI8,INPUT);
+	
+	// GREEN1_OFF;
+	// GREEN2_OFF;
+	// RED1_OFF;
+	// RED2_OFF;
+	// KCZJ1_OFF;
+	// KCZJ2_OFF;
+	// DO1_OFF;
+	// DO2_OFF;
 }
 
 /*
@@ -53,14 +72,14 @@ void Some_Peripherals::Peripheral_GPIO_Config(void)
 			2.频率值（100ms/次）
  @return  : 无
  */
-void Some_Peripherals::LED_Display(LED which_led, unsigned char freq)
-{
-	Which_LED = which_led;
-	LED_Freq = freq;
-	Timer4.setPeriod(100000); // in microseconds, 100ms
-	Timer4.attachCompare1Interrupt(LED_Interrupt);
-	Timer4.setCount(0);
-}
+// void Some_Peripherals::LED_Display(LED which_led, unsigned char freq)
+// {
+// 	Which_LED = which_led;
+// 	LED_Freq = freq;
+// 	Timer4.setPeriod(100000); // in microseconds, 100ms
+// 	Timer4.attachCompare1Interrupt(LED_Interrupt);
+// 	Timer4.setCount(0);
+// }
 
 /*
  @brief   : 暂停所有LED闪烁，同时暂停定时器4
@@ -70,10 +89,10 @@ void Some_Peripherals::LED_Display(LED which_led, unsigned char freq)
 void Some_Peripherals::Stop_LED(void)
 {
 	Timer4.pause();
-	GREEN1_OFF;
-	GREEN2_OFF;
-	RED1_OFF;
-	RED2_OFF;
+	// GREEN1_OFF;
+	// GREEN2_OFF;
+	// RED1_OFF;
+	// RED2_OFF;
 }
 
 /*
@@ -109,27 +128,27 @@ void Some_Peripherals::Start_LED(void)
  */
 void LED_Interrupt(void)
 {
-	static unsigned char LED_StatusFlag = 0; //LED灯状态标志位
-	static unsigned int LED_Num = 0;
-	LED_Num++;
-	if (LED_Num >= LED_Freq)
-	{
-		LED_Num = 0;
-		LED_StatusFlag = ~LED_StatusFlag;
-		switch (Which_LED)
-		{
-		case GREEN1: LED_StatusFlag == 0 ? digitalWrite(LED1_PIN, HIGH) : digitalWrite(LED1_PIN, LOW);
-			digitalWrite(LED2_PIN, LOW); digitalWrite(LED3_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
+	// static unsigned char LED_StatusFlag = 0; //LED灯状态标志位
+	// static unsigned int LED_Num = 0;
+	// LED_Num++;
+	// if (LED_Num >= LED_Freq)
+	// {
+	// 	LED_Num = 0;
+	// 	LED_StatusFlag = ~LED_StatusFlag;
+	// 	switch (Which_LED)
+	// 	{
+	// 	case GREEN1: LED_StatusFlag == 0 ? digitalWrite(LED1_PIN, HIGH) : digitalWrite(LED1_PIN, LOW);
+	// 		digitalWrite(LED2_PIN, LOW); digitalWrite(LED3_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
 
-		case RED1: LED_StatusFlag == 0 ? digitalWrite(LED2_PIN, HIGH) : digitalWrite(LED2_PIN, LOW);
-			digitalWrite(LED1_PIN, LOW); digitalWrite(LED3_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
+	// 	case RED1: LED_StatusFlag == 0 ? digitalWrite(LED2_PIN, HIGH) : digitalWrite(LED2_PIN, LOW);
+	// 		digitalWrite(LED1_PIN, LOW); digitalWrite(LED3_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
 
-		case GREEN2: LED_StatusFlag == 0 ? digitalWrite(LED3_PIN, HIGH) : digitalWrite(LED3_PIN, LOW);
-			digitalWrite(LED1_PIN, LOW); digitalWrite(LED2_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
+	// 	case GREEN2: LED_StatusFlag == 0 ? digitalWrite(LED3_PIN, HIGH) : digitalWrite(LED3_PIN, LOW);
+	// 		digitalWrite(LED1_PIN, LOW); digitalWrite(LED2_PIN, LOW); digitalWrite(LED4_PIN, LOW); break;
 
-		case RED2: LED_StatusFlag == 0 ? digitalWrite(LED4_PIN, HIGH) : digitalWrite(LED4_PIN, LOW);
-			digitalWrite(LED1_PIN, LOW); digitalWrite(LED2_PIN, LOW); digitalWrite(LED3_PIN, LOW); break;
-		}
-	}
+	// 	case RED2: LED_StatusFlag == 0 ? digitalWrite(LED4_PIN, HIGH) : digitalWrite(LED4_PIN, LOW);
+	// 		digitalWrite(LED1_PIN, LOW); digitalWrite(LED2_PIN, LOW); digitalWrite(LED3_PIN, LOW); break;
+	// 	}
+	// }
 }
 

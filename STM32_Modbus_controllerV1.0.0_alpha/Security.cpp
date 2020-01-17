@@ -92,13 +92,13 @@ void Check_Store_Param_And_LoRa(void)
 	{
 		gCheckStoreParamFlag = false;
 		Stop_Self_Check_Timing();
-		LED_SELF_CHECK_ERROR;
+		// LED_SELF_CHECK_ERROR;
 
 		Check_LoRa_Parameter();//检测LoRa各参数和模块是否正常
 		Check_Store_Parameter();//自检SN码、区域号、工作组号等参数
 
 		Start_Self_Check_Timing();
-		LED_RUNNING;
+		// LED_RUNNING;
 		Serial.println("All parameters check SUCCESS... <Check_Store_Parameter>");
 	}
 }

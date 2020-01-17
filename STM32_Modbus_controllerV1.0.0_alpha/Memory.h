@@ -23,8 +23,9 @@
 #define SN_BKP_VERIFY_ADDR                      32
 #define SN_ACCESS_NETWORK_FLAG_ADDR             33
 /*软件版本和硬件版本保存地址*/
-#define SOFT_HARD_VERSION_BASE_ADDR             34
-#define SOFT_HARD_VERSION_END_ADDR              37
+//Software version and hardware version save address.
+#define SOFT_VERSION_BASE_ADDR         34
+#define HARD_VERSION_BASE_ADDR         36
 /*成功重置卷膜总行程标志位保存地址*/
 #define ROUTE_FLAG_ADDR                         38
 /*卷膜总行程时长保存地址*/
@@ -93,7 +94,9 @@
 /*实时开度值保存地址*/
 #define BKP_MOTOR_REALTIME_OPENING_ADDR         5 
 /*实时开度值CRC8保存地址*/
-#define BKP_MOTOR_REALTIME_OPENING_CRC_ADDR     6    
+#define BKP_MOTOR_REALTIME_OPENING_CRC_ADDR     6   
+
+extern String comdata;
 
 /*
  @brief     : 上拉该引脚，禁止EEPROM写操作
@@ -179,6 +182,8 @@ class Soft_Hard_Vertion : public EEPROM_Operations {
 public:
 	void Save_hardware_version(unsigned char number_high, unsigned char number_low);
 	void Save_Software_version(unsigned char number_high, unsigned char number_low);
+	unsigned char Read_hardware_version(unsigned char number_addr);
+	unsigned char Read_Software_version(unsigned char number_addr);
 };
 
 

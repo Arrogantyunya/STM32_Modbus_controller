@@ -451,7 +451,6 @@ bool LoRa::Rewrite_ID(void)
 	if (LoRa_Para_Config.Verify_LoRa_Addr_Flag())
 	{
 		Serial.println("Verify LoRa Addr <Rewrite_ID>");
-		Serial.println("验证LORA地址 <Rewrite_ID>");
 
 		/* 如果读出来的LoRa地址正确 */
 		if (LoRa_Para_Config.Read_LoRa_Addr((unsigned char *)EP_Buffer))
@@ -477,7 +476,6 @@ bool LoRa::Rewrite_ID(void)
 			else
 			{
 				Serial.println("LoRa addr for AT Correct, OK <Rewrite_ID>");
-				Serial.println("LoRa地址正确, OK <Rewrite_ID>");
 			}
 		}
 		/* EP储存的地址不幸出错，选择相信从AT指令读出来的，重新写入EP保存 */

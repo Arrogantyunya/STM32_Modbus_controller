@@ -59,9 +59,13 @@ void Some_Peripherals::Peripheral_GPIO_Config(void)
 	
 	if (!InitState.Read_InitState_Flag())
 	{
-		Serial.println(".....");
+		Serial.println("No initialization configuration saved <Peripheral_GPIO_Config>");
 	}
-	
+	else
+	{
+		Serial.println("Setting of peripheral pin initialization <Peripheral_GPIO_Config>");
+		Peripheral_GPIO_Config_Init();
+	}
 }
 
 /*
@@ -101,6 +105,16 @@ void Some_Peripherals::Stop_LED(void)
 void Some_Peripherals::Start_LED(void)
 {
 	Timer4.resume();
+}
+
+/*
+ @brief   : 外设引脚进行初始化。
+ @param   : void
+ @return  : 初始化完成返回true，失败返回false
+ */
+bool Some_Peripherals::Peripheral_GPIO_Config_Init(void)
+{
+	
 }
 
 /*

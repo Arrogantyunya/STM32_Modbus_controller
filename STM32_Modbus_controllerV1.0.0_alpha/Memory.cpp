@@ -894,41 +894,68 @@ void Soft_Hard_Vertion::Save_hardware_version(unsigned char number_high, unsigne
 /* 
  @brief     : 存储初始状态的标志位
 			  Save device's InitState Flag.
- @para      : 
- @return    : None
+ @para      : void
+ @return    : 保存成功true，失败false
  */
 bool ModbusController_InitState::Save_InitState_Flag(void)
 {
-	return false;
+	EEPROM_Write_Enable();
+	AT24CXX_WriteOneByte(INIT_STATE_FLAG_ADDR,0x55);
+	EEPROM_Write_Disable();
+	if (AT24CXX_ReadOneByte(INIT_STATE_FLAG_ADDR) == 0x55)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /* 
  @brief     : 读取初始状态的标志位
 			  Read device's InitState Flag.
  @para      : 
- @return    : None
+ @return    : 保存过初始状态返回true,未保存过返回false
  */
 bool ModbusController_InitState::Read_InitState_Flag(void)
 {
-	return false;
+	if (AT24CXX_ReadOneByte(INIT_STATE_FLAG_ADDR) == 0x55)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /* 
  @brief     : 清除初始状态的标志位
 			  Clean device's InitState Flag.
  @para      : 
- @return    : None
+ @return    : 清除成功true，失败false
  */
 bool ModbusController_InitState::Clean_InitState_Flag(void)
 {
-	return false;
+	EEPROM_Write_Enable();
+	AT24CXX_WriteOneByte(INIT_STATE_FLAG_ADDR,0x00);
+	EEPROM_Write_Disable();
+	if (AT24CXX_ReadOneByte(INIT_STATE_FLAG_ADDR) == 0x00)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /* 
  @brief     : 存储DO初始状态
 			  Save device's DO_InitState.
  @para      : 
- @return    : None
+ @return    : 保存成功true，失败false
  */
 bool ModbusController_InitState::Save_DO_InitState(unsigned char *addr)
 {
@@ -961,7 +988,7 @@ bool ModbusController_InitState::Clean_DO_InitState(unsigned char *addr)
  @brief     : 存储AO初始状态
 			  Save device's AO_InitState.
  @para      : 
- @return    : None
+ @return    : 保存成功true，失败false
  */
 bool ModbusController_InitState::Save_AO_InitState(unsigned char *addr)
 {

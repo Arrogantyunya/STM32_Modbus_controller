@@ -111,6 +111,7 @@ public:
 	// void LED_Display(LED which_led, unsigned char freq);
 	void Stop_LED(void);
 	void Start_LED(void);
+	bool Peripheral_GPIO_Config_Init(void);
 
 	// void Key_Buzz(unsigned int d); //800ms  1000 times.
 };

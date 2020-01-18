@@ -108,9 +108,10 @@ void setup()
 
 	Serial.begin(9600); //USART1, 当使用USART下载程序：USART--->USART1
 	LoRa_MHL9LF.BaudRate(9600);
-	bkp_init();								  //备份寄存器初始化使能
+	bkp_init();								//备份寄存器初始化使能
+	Serial.println("dididiid");
 	EEPROM_Operation.EEPROM_GPIO_Config();	//设置EEPROM读写引脚
-	Some_Peripheral.Peripheral_GPIO_Config(); //设置继电器，数字输入，模拟输入等外设引脚
+	Some_Peripheral.Peripheral_GPIO_Config(); //设置继电器，数字输入，模拟输入等外设引脚的模式，以及初始化状态
 	iwdg_feed();
 
 	LoRa_MHL9LF.LoRa_GPIO_Config();

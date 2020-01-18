@@ -22,6 +22,8 @@ SN_Operations SN;
 LoRa_Config LoRa_Para_Config;
 /*创建软件硬件版本对象*/
 Soft_Hard_Vertion Vertion;
+/*创建Modbus控制器初始状态对象*/
+ModbusController_InitState InitState;
 
 /*
  @brief     : 设置EEPROM读写引脚
@@ -269,7 +271,9 @@ bool SN_Operations::Clear_SN_Access_Network_Flag(void)
 {
 	Serial.println("If you need to clear the registration, send \"YES\"	<Clear_SN_Access_Network_Flag>");
 	iwdg_feed();
-	delay(5000);
+	delay(3000);
+	iwdg_feed();
+	delay(3000);
 	iwdg_feed();
 	while (Serial.available() > 0)
 	{
@@ -283,44 +287,37 @@ bool SN_Operations::Clear_SN_Access_Network_Flag(void)
 
 		if (comdata == String("YES"))
 		{
-			Serial.println(String("comdata = ")+comdata);
+			Serial.println("Clear the Registration <Clear_SN_Access_Network_Flag>");
+
+			comdata = "";
+			
+			if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) != 0x00)
+			{
+				EEPROM_Write_Enable();
+				AT24CXX_WriteOneByte(SN_ACCESS_NETWORK_FLAG_ADDR, 0x00);
+				EEPROM_Write_Disable();
+			}
+			/*验证标志位是否清除成功*/
+			if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) == 0x00)
+				return true;
+			else
+				return false;
 		}
 		else
 		{
 			Serial.println("Input error	<Clear_SN_Access_Network_Flag>");
+
+			comdata = "";
+			return false;
 		}
-		
-		
 	}
 	else
 	{
 		Serial.println("END	<Clear_SN_Access_Network_Flag>");
+		comdata = "";
+		return false;
 	}
-	
-	
-	
-	// if (digitalRead(SW_FUN2) == LOW)    //如果功能按键2按下
-	// {
-	// 	iwdg_feed();
-	// 	delay(5000);    //保持按下5S
-	// 	iwdg_feed();
-	// 	if (digitalRead(SW_FUN2) == LOW)
-	// 	{
-	// 		if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) != 0x00)
-	// 		{
-	// 			EEPROM_Write_Enable();
-	// 			AT24CXX_WriteOneByte(SN_ACCESS_NETWORK_FLAG_ADDR, 0x00);
-	// 			EEPROM_Write_Disable();
-	// 		}
-	// 		/*验证标志位是否清除成功*/
-	// 		if (AT24CXX_ReadOneByte(SN_ACCESS_NETWORK_FLAG_ADDR) == 0x00)
-	// 			return true;
-	// 		else
-	// 			return false;
-	// 	}
-	// 	return false;
-	// }
-	// return false;
+	return false;
 }
 
 /*
@@ -785,6 +782,7 @@ bool LoRa_Config::Save_LoRa_Addr(unsigned char *addr)
 	for (unsigned char i = 0; i < 8; i++)
 	{
 		TempBuf[i] = AT24CXX_ReadOneByte(EP_LORA_ADDR_BASE_ADDR + i);
+		// Serial.println(String("TempBuf[") + i + "]=" + TempBuf[i]);
 	}
 	AddrTempCrc8 = GetCrc8(&TempBuf[0], 8);
 
@@ -892,3 +890,103 @@ void Soft_Hard_Vertion::Save_hardware_version(unsigned char number_high, unsigne
 	AT24CXX_WriteOneByte(HARD_VERSION_BASE_ADDR + 1, number_low);
 	EEPROM_Write_Disable();
 }
+
+/* 
+ @brief     : 存储初始状态的标志位
+			  Save device's InitState Flag.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Save_InitState_Flag(void)
+{
+	return false;
+}
+
+/* 
+ @brief     : 读取初始状态的标志位
+			  Read device's InitState Flag.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Read_InitState_Flag(void)
+{
+	return false;
+}
+
+/* 
+ @brief     : 清除初始状态的标志位
+			  Clean device's InitState Flag.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Clean_InitState_Flag(void)
+{
+	return false;
+}
+
+/* 
+ @brief     : 存储DO初始状态
+			  Save device's DO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Save_DO_InitState(unsigned char *addr)
+{
+	return false;
+}
+
+/* 
+ @brief     : 读取DO初始状态
+			  Read device's DO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Read_DO_InitState(unsigned char *addr)
+{
+	return false;
+}
+
+/* 
+ @brief     : 清除DO初始状态
+			  Clean device's DO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Clean_DO_InitState(unsigned char *addr)
+{
+	return false;
+}
+
+/* 
+ @brief     : 存储AO初始状态
+			  Save device's AO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Save_AO_InitState(unsigned char *addr)
+{
+	return false;
+}
+
+/* 
+ @brief     : 读取AO初始状态
+			  Read device's AO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Read_AO_InitState(unsigned char *addr)
+{
+	return false;
+}
+
+/* 
+ @brief     : 清除AO初始状态
+			  Clean device's AO_InitState.
+ @para      : 
+ @return    : None
+ */
+bool ModbusController_InitState::Clean_AO_InitState(unsigned char *addr)
+{
+	return false;
+}
+

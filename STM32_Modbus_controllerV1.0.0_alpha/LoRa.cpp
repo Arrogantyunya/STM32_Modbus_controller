@@ -470,7 +470,7 @@ bool LoRa::Rewrite_ID(void)
 			{
 				Serial.println("LoRa addr for AT Error!, write EP addr to LoRa! <Rewrite_ID>");
 				if (!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer)){
-					Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer)");
+					// Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, EP_Buffer)");
 					return false;
 				}
 			}
@@ -485,7 +485,7 @@ bool LoRa::Rewrite_ID(void)
 		{
 			Serial.println("EP saved err, rewrite! <Rewrite_ID>");
 			if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)){
-				Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)111");
+				// Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)111");
 				return false;
 			}
 		}
@@ -495,12 +495,12 @@ bool LoRa::Rewrite_ID(void)
 	{
 		/*写入读出来的地址*/
 		if (!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr)){
-			Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr)");
+			// Serial.println("!LoRa_AT(RcvBuffer, false, AT_ADDR, WriteAddr)");
 			return false;
 		}
 
 		if (!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)){
-			Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)222");
+			// Serial.println("!LoRa_Para_Config.Save_LoRa_Addr((unsigned char *)WriteAddr)222");
 			return false;
 		}
 	}
@@ -607,8 +607,8 @@ void LoRa::Parameter_Init(bool only_net)
 		iwdg_feed();
 		if (!only_net)
 		{
-			StatusBuffer[i++] = Rewrite_ID();Serial.println(String("StatusBuffer[0] = ") + StatusBuffer[0]);
-			StatusBuffer[i++] = Param_Check(AT_MADDR_, "71000000", false);Serial.println(String("StatusBuffer[1] = ") + StatusBuffer[1]);
+			StatusBuffer[i++] = Rewrite_ID();
+			StatusBuffer[i++] = Param_Check(AT_MADDR_, "71000000", false);
 			// StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", true);
 			StatusBuffer[i++] = Param_Check(AT_RIQ_, "00", false);
 			StatusBuffer[i++] = Param_Check(AT_TFREQ_, "1C578DE0", false);
@@ -655,7 +655,7 @@ void LoRa::Parameter_Init(bool only_net)
 
 		for (unsigned char j = 0; j < i; j++)
 		{
-			Serial.println(String("StatusBuffer[")+ j + "]=" + StatusBuffer[j]);
+			// Serial.println(String("StatusBuffer[")+ j + "]=" + StatusBuffer[j]);
 			if (StatusBuffer[j] == false)
 			{
 				SetStatusFlag = false;

@@ -45,6 +45,7 @@
 #define Software_version_low 	0x00  	//软件版本的低位
 #define Hardware_version_high 	0x01 	//硬件版本的高位
 #define Hardware_version_low 	0x00	//硬件版本的低位
+#define Init_Area				0x01	//初始区域ID
 
 // Modbus Registers Offsets (0-9999)
 const int KCZJ1_COIL = 0; 	//继电器1
@@ -80,6 +81,7 @@ const int AI8_IREG = 201; 	//模拟输入8
 
 const int Variable_1 = 300; //变量
 
+//全局变量
 String comdata = "";//串口接收的字符串
 
 //函数声明
@@ -157,12 +159,7 @@ void setup()
 
 	Project_Debug(); //工程模式
 
-	if (Reset_Binding)
-	{
-		/* code */
-	}
-	
-	SN.Clear_SN_Access_Network_Flag(); //按键清除注册到服务器标志位
+	SN.Clear_SN_Access_Network_Flag(); //清除注册到服务器标志位
 
 	/*Request access network(request gateway to save the device's SN code and channel)*/
 	Request_Access_Network(); //检查是否注册到服务器
@@ -228,9 +225,7 @@ void loop()
 	mb.Ireg(AI7_IREG, analogRead(AI7));
 	mb.Ireg(AI8_IREG, analogRead(AI8));
 
-	// Check_Store_Param_And_LoRa(); //检查存储参数以及LORA参数
-	// Serial.println(analogRead(AI1));
-	// delay(1000);
+	Check_Store_Param_And_LoRa(); //检查存储参数以及LORA参数
 }
 
 
@@ -298,37 +293,47 @@ void Request_Access_Network(void)
 		gAccessNetworkFlag = false;
 
 		if (SN.Save_SN_Code(gSN_Code) && SN.Save_BKP_SN_Code(gSN_Code))
-			Serial.println("Write Inital SN success...写入初始SN成功");
+			Serial.println("Write Inital SN success... <Request_Access_Network>");
 
 		if (SN.Clear_Area_Number() && SN.Clear_Group_Number())
 		{
-			Serial.println("Already Clear area number and grouop number...");
-			Serial.println("已清除区域号和组号");
+			Serial.println("Already Clear area number and group number... <Request_Access_Network>");
 		}
 
 		unsigned char Default_WorkGroup[5] = {0x01, 0x00, 0x00, 0x00, 0x00};
 		if (SN.Save_Group_Number(Default_WorkGroup))
-			Serial.println("Save Inital gourp number success...保存初始组ID成功");
+			Serial.println("Save Inital group number success... <Request_Access_Network>");
+		if (SN.Save_Area_Number(Init_Area))
+			Serial.println("Save Inital area number success... <Request_Access_Network>");
 
+		Serial.println("Not registered to server, please send \"S\"	<Request_Access_Network>");
 		// LED_NO_REGISTER;
 	}
-	// while (SN.Verify_SN_Access_Network_Flag() == false)
-	// {
-	// 	iwdg_feed();
-	// 	if (digitalRead(SW_FUN1) == LOW)
-	// 	{
-	// 		MyDelayMs(5000);
-	// 		iwdg_feed();
-	// 		if (digitalRead(SW_FUN1) == LOW)
-	// 		{
-	// 			Message_Receipt.Report_General_Parameter();
-
-	// 			while (digitalRead(SW_FUN1) == LOW)
-	// 				iwdg_feed();
-	// 		}
-	// 	}
-	// 	LoRa_Command_Analysis.Receive_LoRa_Cmd();
-	// }
+	while (SN.Verify_SN_Access_Network_Flag() == false)
+	{
+		iwdg_feed();
+		while (Serial.available() > 0)
+		{
+			comdata += char(Serial.read());  //每次读一个char字符，并相加
+			delay(2);
+    	}
+		
+		if (comdata.length() > 0)
+		{
+			comdata.toUpperCase();
+			Serial.println(comdata);
+			if (comdata == String("S"))
+			{
+				comdata = "";
+				Serial.println("Start sending registration data to server <Request_Access_Network>");
+				Message_Receipt.Report_General_Parameter();
+			}
+			
+			iwdg_feed();
+		}
+		comdata = "";
+		LoRa_Command_Analysis.Receive_LoRa_Cmd();
+	}
 	gAccessNetworkFlag = true;
 }
 
@@ -340,6 +345,16 @@ void Request_Access_Network(void)
  */
 void Project_Debug(void)
 {
+	// while (1)
+	// {
+	// 	iwdg_feed();
+	// 	for (size_t i = 0; i < 12; i++)
+	// 	{
+			
+	// 	}
+		
+	// }
+	
 }
 
 void Key_Reset_LoRa_Parameter(void)

@@ -82,6 +82,16 @@
 #define EP_LORA_ADDR_VERIFY_ADDR                87
 #define EP_LORA_ADDR_SAVED_FLAG_ADDR            88
 
+/* Modbus控制器的初始状态存储 */
+#define INIT_STATE_FLAG_ADDR					89
+#define DO_INIT_STATE_BASE_ADDR					90
+#define DO_INIT_STATE_END_ADDR					97
+#define AO_INIT_STATE_BASE_ADDR					98
+#define AO_INIT_STATE_END_ADDR					113
+#define INIT_STATE_VERIFY_ADDR					114
+
+
+
 /*使用芯片自带备份寄存器的宏定义地址*/
 /*上一次开度值保存地址（0 - 100）*/
 #define BKP_MOTOR_LAST_OPENING_ADDR             1
@@ -149,7 +159,6 @@ public:
 	bool Check_Group_Number(void);
 	bool Verify_Group_Number_Flag(void);
 	bool Clear_Group_Number(void);
-    
 
 	void Read_Random_Seed(unsigned char *random_seed);
 
@@ -186,6 +195,26 @@ public:
 	unsigned char Read_Software_version(unsigned char number_addr);
 };
 
+class ModbusController_InitState : public EEPROM_Operations{
+private:
+	/* data */
+public:
+	bool Save_InitState_Flag(void);//存储初始状态的标志位
+	bool Read_InitState_Flag(void);//读取初始状态的标志位
+	bool Clean_InitState_Flag(void);//清除初始状态的标志位
+
+	bool Save_DO_InitState(unsigned char *addr);//存储DO初始状态
+	bool Read_DO_InitState(unsigned char *addr);//读取DO初始状态
+	bool Clean_DO_InitState(unsigned char *addr);//清除DO初始状态
+
+	bool Save_AO_InitState(unsigned char *addr);//存储AO初始状态
+	bool Read_AO_InitState(unsigned char *addr);//读取AO初始状态
+	bool Clean_AO_InitState(unsigned char *addr);//清除AO初始状态
+
+	//
+};
+
+
 
 /*Create EEPROM object*/
 extern EEPROM_Operations EEPROM_Operation;
@@ -195,5 +224,7 @@ extern SN_Operations SN;
 extern LoRa_Config LoRa_Para_Config;
 /*Create software and hardware object*/
 extern Soft_Hard_Vertion Vertion;
+/*Create ModbusController_InitState object*/
+extern ModbusController_InitState InitState;
 
 #endif

@@ -12,6 +12,7 @@
 #include "fun_periph.h"
 #include <libmaple/iwdg.h>
 #include "pwm.h"
+#include "Memory.h"
 
 Some_Peripherals Some_Peripheral;
 
@@ -56,14 +57,11 @@ void Some_Peripherals::Peripheral_GPIO_Config(void)
 	pinMode(AI7,INPUT);
 	pinMode(AI8,INPUT);
 	
-	// GREEN1_OFF;
-	// GREEN2_OFF;
-	// RED1_OFF;
-	// RED2_OFF;
-	// KCZJ1_OFF;
-	// KCZJ2_OFF;
-	// DO1_OFF;
-	// DO2_OFF;
+	if (!InitState.Read_InitState_Flag())
+	{
+		Serial.println(".....");
+	}
+	
 }
 
 /*

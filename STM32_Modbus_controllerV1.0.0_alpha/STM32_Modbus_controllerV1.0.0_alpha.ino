@@ -19,9 +19,11 @@
 #include <libmaple/bkp.h>
 #include <libmaple/iwdg.h>
 #include <RTClock.h>
+#include <wirish_debug.h>
 
 #include "Modbus.h"
 #include "ModbusSerial.h"
+#include "Set_coil.h"
 #include "i2c.h"
 #include "Command_Analysis.h"
 #include "receipt.h"
@@ -47,45 +49,11 @@
 #define Hardware_version_low 	0x00	//硬件版本的低位
 #define Init_Area				0x01	//初始区域ID
 
-// Modbus Registers Offsets (0-9999)
-const int KCZJ1_COIL = 0; 	//继电器1
-const int KCZJ2_COIL = 1; 	//继电器2
-const int KCZJ3_COIL = 2; 	//继电器3
-const int KCZJ4_COIL = 3; 	//继电器4
-const int KCZJ5_COIL = 4; 	//继电器5
-const int KCZJ6_COIL = 5; 	//继电器6
-const int KCZJ7_COIL = 6; 	//继电器7
-const int KCZJ8_COIL = 7; 	//继电器8
-const int KCZJ9_COIL = 8; 	//继电器9
-const int KCZJ10_COIL = 9; 	//继电器10
-const int KCZJ11_COIL = 10; //继电器11
-const int KCZJ12_COIL = 11; //继电器12
-
-const int DI1_ISTS = 100; 	//数字输入1
-const int DI2_ISTS = 101; 	//数字输入2
-const int DI3_ISTS = 100; 	//数字输入3
-const int DI4_ISTS = 101; 	//数字输入4
-const int DI5_ISTS = 100; 	//数字输入5
-const int DI6_ISTS = 101; 	//数字输入6
-const int DI7_ISTS = 100; 	//数字输入7
-const int DI8_ISTS = 101; 	//数字输入8
-
-const int AI1_IREG = 200; 	//模拟输入1
-const int AI2_IREG = 201; 	//模拟输入2
-const int AI3_IREG = 200; 	//模拟输入3
-const int AI4_IREG = 201; 	//模拟输入4
-const int AI5_IREG = 200; 	//模拟输入5
-const int AI6_IREG = 201; 	//模拟输入6
-const int AI7_IREG = 200; 	//模拟输入7
-const int AI8_IREG = 201; 	//模拟输入8
-
-const int Variable_1 = 300; //变量
 
 //全局变量
 String comdata = "";//串口接收的字符串
 
 //函数声明
-void Modbus_Config(void);
 void Request_Access_Network(void);
 void Project_Debug(void);
 void Key_Reset_LoRa_Parameter(void);
@@ -93,15 +61,14 @@ void Key_Reset_LoRa_Parameter(void);
 
 unsigned char gSN_Code[9] = {0x00}; //设备出厂默认SN码全为0
 
-ModbusSerial mb;
-
 // the setup function runs once when you press reset or power the board
 void setup()
 {
-	Modbus_Config();
+	Modbus_Coil.Modbus_Config();
 
 	/*Serial Wire debug only (JTAG-DP disabled, SW-DP enabled)*/
-	afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY);
+	// C:\Program Files (x86)\Arduino\hardware\stm32\STM32F1\system\libmaple\stm32f1\include\series
+	afio_cfg_debug_ports(AFIO_DEBUG_NONE);
 
 	/*配置IWDG*/
 	iwdg_init(IWDG_PRE_256, 1000); //6.5ms * 1000 = 6500ms.
@@ -193,90 +160,13 @@ void loop()
 	iwdg_feed();
 
 	// LoRa_Command_Analysis.Receive_LoRa_Cmd();//从网关接收LoRa数据
-	mb.task();
-
-	digitalWrite(KCZJ1, mb.Coil(KCZJ1_COIL));
-	digitalWrite(KCZJ2, mb.Coil(KCZJ2_COIL));
-	digitalWrite(KCZJ3, mb.Coil(KCZJ3_COIL));
-	digitalWrite(KCZJ4, mb.Coil(KCZJ4_COIL));
-	digitalWrite(KCZJ5, mb.Coil(KCZJ5_COIL));
-	digitalWrite(KCZJ6, mb.Coil(KCZJ6_COIL));
-	digitalWrite(KCZJ7, mb.Coil(KCZJ7_COIL));
-	digitalWrite(KCZJ8, mb.Coil(KCZJ8_COIL));
-	digitalWrite(KCZJ9, mb.Coil(KCZJ9_COIL));
-	digitalWrite(KCZJ10, mb.Coil(KCZJ10_COIL));
-	digitalWrite(KCZJ11, mb.Coil(KCZJ11_COIL));
-	digitalWrite(KCZJ12, mb.Coil(KCZJ12_COIL));
-
-	mb.Ists(DI1_ISTS, digitalRead(DI1));
-	mb.Ists(DI2_ISTS, digitalRead(DI2));
-	mb.Ists(DI3_ISTS, digitalRead(DI3));
-	mb.Ists(DI4_ISTS, digitalRead(DI4));
-	mb.Ists(DI5_ISTS, digitalRead(DI5));
-	mb.Ists(DI6_ISTS, digitalRead(DI6));
-	mb.Ists(DI7_ISTS, digitalRead(DI7));
-	mb.Ists(DI8_ISTS, digitalRead(DI8));
-
-	mb.Ireg(AI1_IREG, analogRead(AI1));
-	mb.Ireg(AI2_IREG, analogRead(AI2));
-	mb.Ireg(AI3_IREG, analogRead(AI3));
-	mb.Ireg(AI4_IREG, analogRead(AI4));
-	mb.Ireg(AI5_IREG, analogRead(AI5));
-	mb.Ireg(AI6_IREG, analogRead(AI6));
-	mb.Ireg(AI7_IREG, analogRead(AI7));
-	mb.Ireg(AI8_IREG, analogRead(AI8));
+	
+	Modbus_Coil.Modbus_Realization();//
 
 	Check_Store_Param_And_LoRa(); //检查存储参数以及LORA参数
+	// Serial.println("test <loop>");
+	// delay(2000);
 }
-
-
-/*
- @brief   : 进行modbus库的配置
- @para    : None
- @return  : None
- */
-void Modbus_Config(void)
-{
-	// Config Modbus Serial(port, speed, byte format)
-	mb.config(&Serial1, 9600, SERIAL_8N1);
-	// Set the Slave ID (1-247)
-	mb.setSlaveId(1);
-
-	// Add register
-	mb.addCoil(KCZJ1_COIL);
-	mb.addCoil(KCZJ2_COIL);
-	mb.addCoil(KCZJ3_COIL);
-	mb.addCoil(KCZJ4_COIL);
-	mb.addCoil(KCZJ5_COIL);
-	mb.addCoil(KCZJ6_COIL);
-	mb.addCoil(KCZJ7_COIL);
-	mb.addCoil(KCZJ8_COIL);
-	mb.addCoil(KCZJ9_COIL);
-	mb.addCoil(KCZJ10_COIL);
-	mb.addCoil(KCZJ11_COIL);
-	mb.addCoil(KCZJ12_COIL);
-
-	mb.addIsts(DI1_ISTS);
-	mb.addIsts(DI2_ISTS);
-	mb.addIsts(DI3_ISTS);
-	mb.addIsts(DI4_ISTS);
-	mb.addIsts(DI5_ISTS);
-	mb.addIsts(DI6_ISTS);
-	mb.addIsts(DI7_ISTS);
-	mb.addIsts(DI8_ISTS);
-
-	mb.addIreg(AI1_IREG);
-	mb.addIreg(AI2_IREG);
-	mb.addIreg(AI3_IREG);
-	mb.addIreg(AI4_IREG);
-	mb.addIreg(AI5_IREG);
-	mb.addIreg(AI6_IREG);
-	mb.addIreg(AI7_IREG);
-	mb.addIreg(AI8_IREG);
-
-	mb.addHreg(Variable_1, 127);
-}
-
 
 /*
  @brief   : 检测是否已经注册到服务器成功，如果没有注册，则配置相关参数为默认参数，然后注册到服务器。
@@ -310,31 +200,31 @@ void Request_Access_Network(void)
 		Serial.println("Not registered to server, please send \"S\"	<Request_Access_Network>");
 		// LED_NO_REGISTER;
 	}
-	while (SN.Verify_SN_Access_Network_Flag() == false)
-	{
-		iwdg_feed();
-		while (Serial.available() > 0)
-		{
-			comdata += char(Serial.read());  //每次读一个char字符，并相加
-			delay(2);
-    	}
+	// while (SN.Verify_SN_Access_Network_Flag() == false)
+	// {
+	// 	iwdg_feed();
+	// 	while (Serial.available() > 0)
+	// 	{
+	// 		comdata += char(Serial.read());  //每次读一个char字符，并相加
+	// 		delay(2);
+    // 	}
 		
-		if (comdata.length() > 0)
-		{
-			comdata.toUpperCase();
-			Serial.println(comdata);
-			if (comdata == String("S"))
-			{
-				comdata = "";
-				Serial.println("Start sending registration data to server <Request_Access_Network>");
-				Message_Receipt.Report_General_Parameter();
-			}
+	// 	if (comdata.length() > 0)
+	// 	{
+	// 		comdata.toUpperCase();
+	// 		Serial.println(comdata);
+	// 		if (comdata == String("S"))
+	// 		{
+	// 			comdata = "";
+	// 			Serial.println("Start sending registration data to server <Request_Access_Network>");
+	// 			Message_Receipt.Report_General_Parameter();
+	// 		}
 			
-			iwdg_feed();
-		}
-		comdata = "";
-		LoRa_Command_Analysis.Receive_LoRa_Cmd();
-	}
+	// 		iwdg_feed();
+	// 	}
+	// 	comdata = "";
+	// 	LoRa_Command_Analysis.Receive_LoRa_Cmd();
+	// }
 	gAccessNetworkFlag = true;
 }
 

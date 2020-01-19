@@ -97,7 +97,7 @@ void Stop_Self_Check_Timing(void)
 void Timer3_Interrupt(void)
 {
 	gSelfCheckNum++;
-	if (gSelfCheckNum >= 30) //4 hours	14400
+	if (gSelfCheckNum >= 14400) //4 hours	14400
 	{
 		gSelfCheckNum = 0;
 		gCheckStoreParamFlag = true;

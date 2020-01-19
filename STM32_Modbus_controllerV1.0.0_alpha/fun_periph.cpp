@@ -13,6 +13,7 @@
 #include <libmaple/iwdg.h>
 #include "pwm.h"
 #include "Memory.h"
+#include "Set_coil.h"
 
 Some_Peripherals Some_Peripheral;
 
@@ -60,11 +61,22 @@ void Some_Peripherals::Peripheral_GPIO_Config(void)
 	if (!InitState.Read_InitState_Flag())
 	{
 		Serial.println("No initialization configuration saved <Peripheral_GPIO_Config>");
+		iwdg_feed();
+		
+		while (!Modbus_Coil.Set_Coil_DefaultValue())//设置线圈为默认值
+		{
+			Serial.println("ERROR!!! Set_Coil_DefaultValue Failure!!!");
+			delay(1000);
+		}
 	}
 	else
 	{
 		Serial.println("Setting of peripheral pin initialization <Peripheral_GPIO_Config>");
-		Peripheral_GPIO_Config_Init();
+		while (!Modbus_Coil.Set_Coil_InitValue())//设置线圈为初始值
+		{
+			Serial.println("ERROR!!! Set_Coil_DefaultValue Failure!!!");
+			delay(1000);
+		}
 	}
 }
 
@@ -108,14 +120,16 @@ void Some_Peripherals::Start_LED(void)
 }
 
 /*
- @brief   : 外设引脚进行初始化。
+ @brief   : 外设引脚初始化。
  @param   : void
  @return  : 初始化完成返回true，失败返回false
  */
-bool Some_Peripherals::Peripheral_GPIO_Config_Init(void)
-{
+// bool Some_Peripherals::Peripheral_GPIO_Config_Init(void)
+// {
 	
-}
+// }
+
+
 
 /*
  @brief   : 蜂鸣器按照固定频率发出响声，表明按键被按下。
